@@ -44,12 +44,14 @@ final class MainViewModel: ObservableObject {
     }
     
     @MainActor
-    func updateSelectedMealDetail(by id: String) async {
-        let detail = try? await networkMgr.fetchMealDetailById(id: id)
-        
-        if let detail = detail {
-            self.selectedMealDetail = detail
-            self.showDetailView = true
+    func updateSelectedMealDetail(by id: String) {
+        Task {
+            let detail = try? await networkMgr.fetchMealDetailById(id: id)
+            
+            if let detail = detail {
+                self.selectedMealDetail = detail
+                self.showDetailView = true
+            }
         }
     }
 }

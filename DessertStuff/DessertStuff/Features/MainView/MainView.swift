@@ -9,9 +9,10 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject var viewModel: MainViewModel
+    private let layout = [GridItem(.adaptive(minimum: ScreenDimension.width * 0.4))]
     
     var body: some View {
-        NavigationView {
+        VStack {
             if viewModel.isError {
                 VStack {
                     Spacer ()
@@ -30,47 +31,25 @@ struct MainView: View {
                 }
             } else {
                 ScrollView {
-                    LazyVStack {
+                    LazyVGrid(columns: layout) {
                         ForEach(viewModel.mealList, id: \.self) { meal in
+
                             Button {
-                                viewModel.selectedMealId = meal.idMeal
+                                viewModel.updateSelectedMealDetail(by: meal.idMeal)
                             } label: {
-                                HStack {
-                                    AsyncImage(url: URL(string: meal.strMealThumb)) { image in
-                                        image
-                                            .resizable()
-                                            .frame(width: 50, height: 50)
-                                            .clipShape(Circle())
-                                            .shadow(radius: 10)
-                                    } placeholder: {
-                                        ProgressView()
-                                            .frame(width: 50, height: 50)
-                                    }
-                                    
-                                    Text(meal.strMeal)
-                                        .padding(.leading)
-                                    
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .padding(.horizontal)
-                                }
-                                .padding(.leading)
-                                Divider()
+                                MealTileView(meal: meal)
+                                    .padding(.bottom, Constants.paddingMedium)
+                                    .frame(width: ScreenDimension.width * 0.4,
+                                           height: ScreenDimension.height * 0.25)
                             }
+
                         }
                     }
                 }
             }
         }
-        .sheet(isPresented: $viewModel.showDetailView, content: {
+        .fullScreenCover(isPresented: $viewModel.showDetailView, content: {
             MealDetailView(viewModel: MealDetailViewModel(mealDetail: viewModel.selectedMealDetail!))
-        })
-        .onChange(of: viewModel.selectedMealId, perform: { selectedMealId in
-            Task {
-                await viewModel.updateSelectedMealDetail(by: selectedMealId)
-            }
         })
         .task {
             await viewModel.fetchMealList()
@@ -92,10 +71,6 @@ struct MealTileView: View {
             AsyncImage(url: URL(string: meal.strMealThumb)) { image in
                 image
                     .centerCropped()
-//                    .resizable()
-//                    .frame(width: 50, height: 50)
-//                    .clipShape(Circle())
-//                    .shadow(radius: 10)
             } placeholder: {
                 ProgressView()
                     .frame(width: 50, height: 50)

@@ -25,4 +25,8 @@ struct Constants {
     static let paddingSmall: CGFloat = 3
     static let paddingMedium: CGFloat = 6
     static let paddingLarge: CGFloat = 8
+    
+    static let buttonSizeSmall: CGFloat = 15
+    static let buttonSizeMedium: CGFloat = 30
+    static let buttonSizeLarge: CGFloat = 10
 }
